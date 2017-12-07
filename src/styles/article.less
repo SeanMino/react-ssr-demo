@@ -1,0 +1,355 @@
+@px: 0.02rem;
+.intro {
+  font-size: 20 * @px;
+}
+
+#toc {
+  float: right;
+  border: 1 * @px solid #e2e2e2;
+  font-size: 14 * @px;
+  margin: 0 0 15 * @px 20 * @px;
+  max-width: 260 * @px;
+  min-width: 120 * @px;
+  padding: 6 * @px;
+  background-color: #fff;
+}
+
+#toc p {
+  margin: 1 * @px;
+}
+
+#toc ul {
+  margin: 0 .5em 0 1.5em;
+}
+
+#toc strong {
+  border-bottom: 1 * @px solid #e2e2e2;
+  display: block;
+}
+
+a.anchor {
+  display: block;
+  position: relative;
+  visibility: hidden;
+}
+
+article img {
+  height: auto;
+  max-width: 910 * @px;
+}
+
+article {
+  border-bottom: 1 * @px solid #ddd;
+  border-top: 1 * @px solid #fff;
+  padding: 25 * @px 0;
+  position: relative;
+  word-wrap: break-word;
+  background-color: #ffffff;
+}
+
+article .meta {
+  color: #555;
+  float: right;
+  font-size: 16 * @px;
+  line-height: 2;
+  position: relative;
+  text-align: right;
+  width: auto
+}
+
+article .meta a {
+  color: #999
+}
+
+article h1.title {
+  font-size: 35 * @px;
+  font-weight: 300;
+  line-height: 60 * @px;
+  margin-bottom: 25 * @px
+}
+
+article h1.title,
+article h1.title a {
+  color: #333
+}
+
+article .meta .date,
+article .meta .comment,
+article .meta .tags {
+  position: relative
+}
+
+article h1.title a:hover {
+  color: #2479CC;
+  transition: color .3s
+}
+
+article button,
+article input.runcode {
+  -webkit-appearance: button;
+  background: #12b0e6;
+  border: none;
+  box-shadow: inset 0 -5 * @px 20 * @px rgba(0, 0, 0, .1);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14 * @px;
+  line-height: 1;
+  margin-top: 10 * @px;
+  padding: 0.625em .5em
+}
+
+article strong {
+  font-weight: 700
+}
+
+article em {
+  font-style: italic
+}
+
+article blockquote {
+  background-color: #f8f8f8;
+  border-left: 5 * @px solid #2479CC;
+  margin-top: 10 * @px;
+  margin-left: 0;
+  padding: 15 * @px 20 * @px
+}
+
+article code {
+  border-radius: 5 * @px;
+  font-family: Consolas, Courier New, Courier, mono, serif;
+  font-size: 100%;
+  margin: 0 2 * @px;
+  padding: 4 * @px 5 * @px;
+  vertical-align: middle;
+  color: #333;
+}
+
+article pre {
+  color: #5d6a6a;
+  font-family: "Consolas", "Liberation Mono", Courier, monospace;
+  font-size: 14 * @px;
+  line-height: 1.6;
+  overflow: hidden;
+  position: relative;
+  white-space: pre-wrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: aliceblue;
+  padding: 10px;
+  border-radius: 3px;
+}
+
+article pre code {
+  border-radius: 0 0 0 0;
+  border: 0;
+  display: block;
+  font-size: 12 * @px;
+  margin: 0;
+  padding: 10 * @px 20 * @px;
+  position: relative;
+  font-weight: bold;
+}
+
+article img {
+  border: 1 * @px solid #ccc;
+  display: block;
+  margin: 10 * @px 0 5 * @px;
+  max-width: 100%;
+  width: auto;
+  padding: 0
+}
+
+article table {
+  border: 0;
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+article blockquote p {
+  padding: 0;
+  margin: 0;
+}
+
+article table th,
+article table td {
+  border: 0
+}
+
+article table th {
+  border-bottom: 2 * @px solid #848484;
+  padding: 6 * @px 20 * @px;
+  text-align: left
+}
+
+article table td {
+  border-bottom: 1 * @px solid #d0d0d0;
+  padding: 6 * @px 20 * @px
+}
+
+article .expire-tips {
+  background-color: #ffffc0;
+  border: 1 * @px solid #e2e2e2;
+  border-left: 5 * @px solid #fff000;
+  color: #333;
+  font-size: 15 * @px;
+  padding: 5 * @px 10 * @px
+}
+
+article .aliyun-tips {
+  background-color: #f0f8f4;
+  border: 1 * @px solid #e2e2e2;
+  border-left: 5 * @px solid #7cc4a0;
+  font-size: 15 * @px;
+  padding: 5 * @px 10 * @px
+}
+
+article .post-info {
+  font-size: 14 * @px
+}
+
+article .entry-content {
+  font-size: 16 * @px;
+  line-height: 1.8;
+  word-wrap: break-word
+}
+
+article .entry-content p,
+article .entry-content blockquote,
+article .entry-content ul,
+article .entry-content ol,
+article .entry-content dl,
+article .entry-content table,
+article .entry-content iframe,
+article .entry-content h1,
+article .entry-content h2,
+article .entry-content h3,
+article .entry-content h4,
+article .entry-content h5,
+article .entry-content h6,
+article .entry-content p,
+article .entry-content pre {
+  margin-top: 15 * @px
+}
+
+article pre b.name {
+  color: #eee;
+  font-size: 60 * @px;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  right: 10 * @px;
+  top: 10 * @px
+}
+
+article .entry-content .date {
+  color: #999;
+  font-size: 14 * @px;
+  font-style: italic
+}
+
+article input.runcode:hover,
+article input.runcode:focus,
+article input.runcode:active {
+  background: #f6ad08
+}
+
+article .entry-content ul ul,
+article .entry-content ul ol,
+article .entry-content ul dl,
+article .entry-content ol ul,
+article .entry-content ol ol,
+article .entry-content ol dl,
+article .entry-content dl ul,
+article .entry-content dl ol,
+article .entry-content dl dl,
+article .entry-content blockquote > p:first-of-type {
+  margin-top: 0
+}
+
+article .entry-content ul,
+article .entry-content ol,
+article .entry-content dl {
+  margin-left: 25 * @px
+}
+
+article .entry-content ul > li {
+  list-style: disc;
+  ul > li {
+    list-style: circle;
+    ul > li {
+      list-style: lower-greek;
+    }
+  }
+}
+
+article.tags section a {
+  border: 1 * @px solid rgba(36, 121, 204, .8);
+  border-radius: 4 * @px;
+  color: rgba(36, 121, 204, .8);
+  display: inline-block;
+  font-size: 14 * @px;
+  height: 40 * @px;
+  line-height: 40 * @px;
+  margin: 0 15 * @px 10 * @px 0;
+  padding: 0 15 * @px;
+  text-decoration: none;
+  -webkit-transition: color .2s cubic-bezier(.4, .01, .165, .99), border .2s cubic-bezier(.4, .01, .165, .99);
+  transition: color .2s cubic-bezier(.4, .01, .165, .99), border .2s cubic-bezier(.4, .01, .165, .99)
+}
+
+article.tags section a:hover {
+  border-color: #2479CC;
+  color: #2479CC
+}
+
+.article-tip {
+  font-size: 16 * @px;
+  margin-top: 20 * @px;
+}
+
+.article-about {
+  border-bottom: .02rem solid #ddd;
+  border-top: .02rem solid #fff;
+  padding: 1rem 0;
+  position: relative;
+  word-wrap: break-word;
+  background-color: #fff;
+  font-size: 0.32rem;
+}
+
+.article-about .title {
+  margin-bottom: 0.2rem;
+}
+
+.article-about li {
+  display: block;
+  height: 0.5rem;
+  line-height: 0.5rem;
+  padding-left: 0.2rem;
+}
+
+.reprint-block{
+  font-size: 0.1rem;
+}
+
+
+h1.intro {
+  background-color: #f6f9fa;
+  color: #999;
+  padding: 20 * @px 30 * @px;
+  text-align: center;
+  position: absolute;
+  top: -70 * @px;
+  width: 100%;
+}
+
+#main {
+  -webkit-overflow-scrolling: touch;
+  padding-left: 190 * @px;
+  padding-right: 40 * @px;
+  padding-top: 70 * @px;
+}
+
+#page-index {
+  position: relative;
+}
