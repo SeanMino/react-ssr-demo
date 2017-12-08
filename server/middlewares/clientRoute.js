@@ -9,61 +9,82 @@ const redis = require("../config/ioRedis");
 
 async function clientRoute(ctx, next) {
   let url = ctx.url;
-  let data = await getFromRedis(url, async() => {
-    return await getRenderData(url)
+  const renderStart = new Date().getTime();
+  let string = await getFromRedis(url, async() => {
+
+    let renderProps = await getRenderProps(url);
+    if (!renderProps) {
+      return false
+    }
+
+    let data = await getRenderData(renderProps);
+    if (!data) {
+      return false
+    }
+
+    // console.log("getRenderData:", url, new Date().getTime() - renderStart, "ms");
+
+    let string = await getTemplate(data);
+    if (!string) {
+      return false
+    }
+
+    const now = new Date().getTime();
+    // console.log("缓存击穿:", url, now - renderStart, "ms");
+    return string
   });
 
-  if (data) {
-    const renderStart = new Date().getTime();
-    ctx.body = await getTemplate(data, url);
+  if (string) {
+    ctx.body = string;
     const now = new Date().getTime();
-    console.log("服务端render:", now - renderStart, "ms");
+    // console.log("服务端render:", url, now - renderStart, "ms");
   }
   else {
     await next();
-    // 重定向到404页面
-    // if (ctx.status == 404) {
-    //   ctx.redirect('/404')
-    // }
+    const now = new Date().getTime();
+    // console.log("服务端输出:", url, now - renderStart, "ms");
   }
 }
 
 
-function getRenderProps(url) {
-  return new Promise((resovle, rej) => {
-    match({ routes, location: url }, (error, redirectLocation, renderProps) => {
-      if (error) {
-        console.log('url错误', url, error);
-        resovle(undefined)
-      } else {
-        resovle(renderProps)
-      }
-    });
-  })
-}
-
 async function getFromRedis(key, doPromise) {
+  // console.log('查询Redis', key);
   const start = new Date().getTime();
   let result = await redis.get(key);
   if (result === null || result === undefined) {
     let resp = await doPromise();
     await redis.set(key, resp, 10 * 60); // 缓存为10分钟
     const now = new Date().getTime();
-    console.log('www端get:', now - start + "ms", key);
+    // console.log('doPromise:', key, now - start + "ms");
     return resp
   } else {
     const now = new Date().getTime();
-    console.log('www端redis:', now - start + "ms", key);
+    // console.log('doRedis:', key, now - start + "ms");
     return result;
   }
 }
 
-async function getRenderData(url) {
-  let _renderProps = await getRenderProps(url);
+function getRenderProps(url) {
+  const start = new Date().getTime();
+  return new Promise((resovle, rej) => {
+    match({ routes, location: url }, (error, redirectLocation, renderProps) => {
+      const now = new Date().getTime();
+      if (error) {
+        console.log('url错误', url, error);
+        resovle(undefined);
+      } else {
+        resovle(renderProps);
+      }
+      // console.log("getRenderProps输出:", url, now - start, "ms");
+    });
+  })
+}
 
+async function getRenderData(_renderProps) {
   if (!_renderProps) {
-    return null
+    return false
   }
+  const start = new Date().getTime();
 
   let initState = {};
   let htmlString;
@@ -76,7 +97,9 @@ async function getRenderData(url) {
     }
   }
 
-  htmlString = renderToString(
+  // console.log("getRenderData输出1:", new Date().getTime() - start, "ms");
+
+  htmlString = renderToStaticMarkup(
     <RouterContext {..._renderProps}/>
   );
 
@@ -85,6 +108,8 @@ async function getRenderData(url) {
   let headString = renderToString(
     <HeadToHtml head={head}/>
   );
+  const now = new Date().getTime();
+  // console.log("getRenderData输出2:", new Date().getTime() - start, "ms");
 
   return {
     html: htmlString,
@@ -93,20 +118,16 @@ async function getRenderData(url) {
   };
 }
 
-
 // 输出渲染模板
-async function getTemplate(data, key) {
-  return await getFromRedis("template:" + key, () => {
-    return new Promise((resolve, reject) => {
-      let result = fs.readFileSync(path.resolve(__dirname, '../template/index.html'), 'utf-8');
-
-      data.state = JSON.stringify(data.state);
-      let template = result.replace(/{{([^}}]+)?}}/g, function (s0, s1) {
-        return data[s1] ? data[s1] : "";
-      });
-      resolve(template);
-    })
-  });
+async function getTemplate(data) {
+  return new Promise((resolve, reject) => {
+    let result = fs.readFileSync(path.resolve(__dirname, '../template/index.html'), 'utf-8');
+    data.state = JSON.stringify(data.state);
+    let template = result.replace(/{{([^}}]+)?}}/g, function (s0, s1) {
+      return data[s1] ? data[s1] : "";
+    });
+    resolve(template);
+  })
 }
 
 export default clientRoute

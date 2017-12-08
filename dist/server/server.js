@@ -2135,7 +2135,7 @@ var config = __webpack_require__(57);
 var LRUCache = __webpack_require__(168);
 var ssrCache = new LRUCache({
   max: 100,
-  maxAge: 1000 * 60 * 3 // 3分钟的缓存
+  maxAge: 1000 * 30 // 30秒的缓存
 });
 
 var Redis = function () {
@@ -2162,13 +2162,9 @@ var Redis = function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return ssrCache.get(key);
+                return _context.abrupt("return", null);
 
-              case 2:
-                return _context.abrupt("return", _context.sent);
-
-              case 3:
+              case 1:
               case "end":
                 return _context.stop();
             }
@@ -2371,25 +2367,69 @@ var clientRoute = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(ctx, next) {
     var _this = this;
 
-    var url, data, renderStart, now;
+    var url, renderStart, string, now, _now;
+
     return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             url = ctx.url;
-            _context2.next = 3;
+            renderStart = new Date().getTime();
+            _context2.next = 4;
             return getFromRedis(url, _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+              var renderProps, data, string, now;
               return _regenerator2.default.wrap(function _callee$(_context) {
                 while (1) {
                   switch (_context.prev = _context.next) {
                     case 0:
                       _context.next = 2;
-                      return getRenderData(url);
+                      return getRenderProps(url);
 
                     case 2:
-                      return _context.abrupt('return', _context.sent);
+                      renderProps = _context.sent;
 
-                    case 3:
+                      if (renderProps) {
+                        _context.next = 5;
+                        break;
+                      }
+
+                      return _context.abrupt('return', false);
+
+                    case 5:
+                      _context.next = 7;
+                      return getRenderData(renderProps);
+
+                    case 7:
+                      data = _context.sent;
+
+                      if (data) {
+                        _context.next = 10;
+                        break;
+                      }
+
+                      return _context.abrupt('return', false);
+
+                    case 10:
+                      _context.next = 12;
+                      return getTemplate(data);
+
+                    case 12:
+                      string = _context.sent;
+
+                      if (string) {
+                        _context.next = 15;
+                        break;
+                      }
+
+                      return _context.abrupt('return', false);
+
+                    case 15:
+                      now = new Date().getTime();
+
+                      console.log("缓存击穿:", url, now - renderStart, "ms");
+                      return _context.abrupt('return', string);
+
+                    case 18:
                     case 'end':
                       return _context.stop();
                   }
@@ -2397,31 +2437,30 @@ var clientRoute = function () {
               }, _callee, _this);
             })));
 
-          case 3:
-            data = _context2.sent;
+          case 4:
+            string = _context2.sent;
 
-            if (!data) {
-              _context2.next = 13;
+            if (!string) {
+              _context2.next = 10;
               break;
             }
 
-            renderStart = new Date().getTime();
-            _context2.next = 8;
-            return getTemplate(data, url);
-
-          case 8:
-            ctx.body = _context2.sent;
+            ctx.body = string;
             now = new Date().getTime();
+            // console.log("服务端render:", url, now - renderStart, "ms");
 
-            console.log("服务端render:", now - renderStart, "ms");
-            _context2.next = 15;
+            _context2.next = 13;
             break;
 
-          case 13:
-            _context2.next = 15;
+          case 10:
+            _context2.next = 12;
             return next();
 
-          case 15:
+          case 12:
+            _now = new Date().getTime();
+          // console.log("服务端输出:", url, now - renderStart, "ms");
+
+          case 13:
           case 'end':
             return _context2.stop();
         }
@@ -2436,12 +2475,13 @@ var clientRoute = function () {
 
 var getFromRedis = function () {
   var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(key, doPromise) {
-    var start, result, resp, now, _now;
+    var start, result, resp, now, _now2;
 
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
+            // console.log('查询Redis', key);
             start = new Date().getTime();
             _context3.next = 3;
             return redis.get(key);
@@ -2450,7 +2490,7 @@ var getFromRedis = function () {
             result = _context3.sent;
 
             if (!(result === null || result === undefined)) {
-              _context3.next = 15;
+              _context3.next = 14;
               break;
             }
 
@@ -2465,17 +2505,17 @@ var getFromRedis = function () {
           case 10:
             // 缓存为10分钟
             now = new Date().getTime();
+            // console.log('doPromise:', key, now - start + "ms");
 
-            console.log('www端get:', now - start + "ms", key);
             return _context3.abrupt('return', resp);
 
-          case 15:
-            _now = new Date().getTime();
+          case 14:
+            _now2 = new Date().getTime();
+            // console.log('doRedis:', key, now - start + "ms");
 
-            console.log('www端redis:', _now - start + "ms", key);
             return _context3.abrupt('return', result);
 
-          case 18:
+          case 16:
           case 'end':
             return _context3.stop();
         }
@@ -2489,115 +2529,115 @@ var getFromRedis = function () {
 }();
 
 var getRenderData = function () {
-  var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee4(url) {
-    var _renderProps, initState, htmlString, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, component, data, head, headString;
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee4(_renderProps) {
+    var start, initState, htmlString, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, component, data, head, headString, now;
 
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            _context4.next = 2;
-            return getRenderProps(url);
-
-          case 2:
-            _renderProps = _context4.sent;
-
             if (_renderProps) {
-              _context4.next = 5;
+              _context4.next = 2;
               break;
             }
 
-            return _context4.abrupt('return', null);
+            return _context4.abrupt('return', false);
 
-          case 5:
+          case 2:
+            start = new Date().getTime();
             initState = {};
             htmlString = void 0;
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _iteratorError = undefined;
-            _context4.prev = 10;
+            _context4.prev = 8;
             _iterator = (0, _getIterator3.default)(_renderProps.components);
 
-          case 12:
+          case 10:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-              _context4.next = 23;
+              _context4.next = 21;
               break;
             }
 
             component = _step.value;
 
             if (!(component && component.getInitialProps)) {
-              _context4.next = 20;
+              _context4.next = 18;
               break;
             }
 
-            _context4.next = 17;
+            _context4.next = 15;
             return component.getInitialProps(_renderProps);
 
-          case 17:
+          case 15:
             data = _context4.sent;
 
             initState = (0, _assign2.default)(initState, data);
             component.defaultProps = (0, _assign2.default)({}, component.defaultProps, data);
 
-          case 20:
+          case 18:
             _iteratorNormalCompletion = true;
-            _context4.next = 12;
+            _context4.next = 10;
+            break;
+
+          case 21:
+            _context4.next = 27;
             break;
 
           case 23:
-            _context4.next = 29;
-            break;
-
-          case 25:
-            _context4.prev = 25;
-            _context4.t0 = _context4['catch'](10);
+            _context4.prev = 23;
+            _context4.t0 = _context4['catch'](8);
             _didIteratorError = true;
             _iteratorError = _context4.t0;
 
-          case 29:
-            _context4.prev = 29;
-            _context4.prev = 30;
+          case 27:
+            _context4.prev = 27;
+            _context4.prev = 28;
 
             if (!_iteratorNormalCompletion && _iterator.return) {
               _iterator.return();
             }
 
-          case 32:
-            _context4.prev = 32;
+          case 30:
+            _context4.prev = 30;
 
             if (!_didIteratorError) {
-              _context4.next = 35;
+              _context4.next = 33;
               break;
             }
 
             throw _iteratorError;
 
+          case 33:
+            return _context4.finish(30);
+
+          case 34:
+            return _context4.finish(27);
+
           case 35:
-            return _context4.finish(32);
 
-          case 36:
-            return _context4.finish(29);
+            // console.log("getRenderData输出1:", new Date().getTime() - start, "ms");
 
-          case 37:
-
-            htmlString = (0, _server.renderToString)(_react2.default.createElement(_reactRouter.RouterContext, _renderProps));
+            htmlString = (0, _server.renderToStaticMarkup)(_react2.default.createElement(_reactRouter.RouterContext, _renderProps));
 
             // 渲染頭部
             head = _index2.default.rewind() || (0, _index.defaultHead)();
             headString = (0, _server.renderToString)(_react2.default.createElement(_index.HeadToHtml, { head: head }));
+            now = new Date().getTime();
+            // console.log("getRenderData输出2:", new Date().getTime() - start, "ms");
+
             return _context4.abrupt('return', {
               html: htmlString,
               state: initState,
               head: headString
             });
 
-          case 41:
+          case 40:
           case 'end':
             return _context4.stop();
         }
       }
-    }, _callee4, this, [[10, 25, 29, 37], [30,, 32, 36]]);
+    }, _callee4, this, [[8, 23, 27, 35], [28,, 30, 34]]);
   }));
 
   return function getRenderData(_x5) {
@@ -2609,28 +2649,21 @@ var getRenderData = function () {
 
 
 var getTemplate = function () {
-  var _ref5 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee5(data, key) {
+  var _ref5 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee5(data) {
     return _regenerator2.default.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            _context5.next = 2;
-            return getFromRedis("template:" + key, function () {
-              return new _promise2.default(function (resolve, reject) {
-                var result = _fs2.default.readFileSync(_path2.default.resolve(__dirname, '../template/index.html'), 'utf-8');
-
-                data.state = (0, _stringify2.default)(data.state);
-                var template = result.replace(/{{([^}}]+)?}}/g, function (s0, s1) {
-                  return data[s1] ? data[s1] : "";
-                });
-                resolve(template);
+            return _context5.abrupt('return', new _promise2.default(function (resolve, reject) {
+              var result = _fs2.default.readFileSync(_path2.default.resolve(__dirname, '../template/index.html'), 'utf-8');
+              data.state = (0, _stringify2.default)(data.state);
+              var template = result.replace(/{{([^}}]+)?}}/g, function (s0, s1) {
+                return data[s1] ? data[s1] : "";
               });
-            });
+              resolve(template);
+            }));
 
-          case 2:
-            return _context5.abrupt('return', _context5.sent);
-
-          case 3:
+          case 1:
           case 'end':
             return _context5.stop();
         }
@@ -2638,7 +2671,7 @@ var getTemplate = function () {
     }, _callee5, this);
   }));
 
-  return function getTemplate(_x6, _x7) {
+  return function getTemplate(_x6) {
     return _ref5.apply(this, arguments);
   };
 }();
@@ -2696,14 +2729,17 @@ function _asyncToGenerator(fn) {
 var redis = __webpack_require__(86);
 
 function getRenderProps(url) {
+  var start = new Date().getTime();
   return new _promise2.default(function (resovle, rej) {
     (0, _reactRouter.match)({ routes: _routes2.default, location: url }, function (error, redirectLocation, renderProps) {
+      var now = new Date().getTime();
       if (error) {
         console.log('url错误', url, error);
         resovle(undefined);
       } else {
         resovle(renderProps);
       }
+      // console.log("getRenderProps输出:", url, now - start, "ms");
     });
   });
 }

@@ -6,7 +6,7 @@ const config = require("./index");
 const LRUCache = require('lru-cache');
 const ssrCache = new LRUCache({
   max: 100,
-  maxAge: 1000 * 60 * 3 // 3分钟的缓存
+  maxAge: 1000 * 30  // 30秒的缓存
 });
 
 class Redis {
@@ -23,7 +23,8 @@ class Redis {
   // 只是存的string
   async get(key) {
     // return await this.redis.get(key);
-    return await ssrCache.get(key);
+    // return await ssrCache.get(key);
+    return null
   }
 
   // 只是存的string,过期时间设置单位为秒
