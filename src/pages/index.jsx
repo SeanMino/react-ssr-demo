@@ -51,11 +51,11 @@ export default class Container extends Component {
 
   scrollToHash() {
     let hash = window.location.hash;
-    if (!hash) return;
-    hash = hash.split("#")[1];
-
-    const el = document.getElementById(hash);
-    if (!el) return;
+    let el = document.body;
+    if (hash) {
+      hash = hash.split("#")[1];
+      el = document.getElementById(hash);
+    }
 
     setTimeout(() => el.scrollIntoView(), 0)
   }
