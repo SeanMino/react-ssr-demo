@@ -8,7 +8,7 @@
     "build_server": "webpack --config ./webpack/webpack.server.pro.js --progress",
     "clean": "rimraf ./dist/client/* && rimraf ./dist/server/* ",
     "start": "npm run build && npm run build_server && node ./dist/server/server.js",
-    "server": "node ./server/app"
+    "server": "npm run build && node ./server/app"
   },
   "dependencies": {
     "axios": "^0.17.1",

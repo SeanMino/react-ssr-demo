@@ -11,9 +11,13 @@ npm install
 ```$xslt
 npm run dev
 ```
-打包运行
+webpack编译server 运行
 ```$xslt
 npm run start
+```
+直接启动服务端 
+```$xslt
+npm run server
 ```
 
 ### sass
